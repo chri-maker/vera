@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vera Widget — Demo studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+  body{font-family:Manrope,Arial,sans-serif;margin:0;background:#f2f5f7;color:#12293b}
+  .top{background:#fff;border-bottom:1px solid #e2ebea;padding:16px 22px;font-weight:800;font-size:20px}
+  .hero{max-width:760px;margin:60px auto;padding:0 22px;text-align:center}
+  .hero h1{font-size:40px;margin:0 0 12px}
+  .hero p{font-size:18px;color:#5d7079}
+  .note{max-width:620px;margin:30px auto;background:#fff;border:1px solid #e2ebea;border-radius:16px;padding:22px 26px;color:#5d7079;font-size:15px;line-height:1.6}
+  .note b{color:#12293b}
+</style>
+</head>
+<body>
+  <div class="top">🦴 Studio Fisio Demo — Varese</div>
+  <div class="hero">
+    <h1>Fisioterapia &amp; Osteopatia</h1>
+    <p>Questa è la finta pagina di uno studio. In basso a destra c'è Vera 👇<br>Clicca la bollina e scrivile come farebbe un paziente.</p>
+  </div>
+  <div class="note">
+    <b>Come lo installa uno studio:</b> incolla UNA riga nel suo sito:<br><br>
+    <code>&lt;script src="https://TUO-SERVER/widget.js" data-studio="studio-mario"&gt;&lt;/script&gt;</code><br><br>
+    Cambia solo <b>data-studio</b> col nome del cliente. Il resto (servizi, orari, tono) sta nel suo file di config. Il motore è sempre lo stesso.
+  </div>
+
+  <!-- 👇 ECCO L'INSTALLAZIONE: una riga -->
+  <script src="/widget.js" data-studio="studio-demo"></script>
+</body>
+</html>

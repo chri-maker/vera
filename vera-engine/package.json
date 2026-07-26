@@ -1,0 +1,17 @@
+{
+  "name": "vera-engine",
+  "version": "0.1.0",
+  "description": "Vera — motore segretaria virtuale AI per studi. Multi-studio: 1 config per cliente.",
+  "type": "module",
+  "scripts": {
+    "dryrun": "node test/dryrun.js",
+    "chat": "node test/chat.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "googleapis": "^144.0.0",
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  }
+}
