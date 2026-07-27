@@ -17,6 +17,10 @@
     background:${GRAD};color:#08080c;font:800 26px/1 Manrope,Arial,sans-serif;box-shadow:0 12px 34px -6px rgba(123,107,255,.6);
     z-index:2147483000;transition:transform .2s}
   .vera-btn:hover{transform:scale(1.06)}
+  .vera-aura{position:fixed;bottom:22px;right:22px;width:62px;height:62px;border-radius:50%;pointer-events:none;z-index:2147482999}
+  .vera-aura i{content:"";position:absolute;inset:-10px;border-radius:50%;display:block;
+    background:conic-gradient(from 0deg,#35d0ff,#7b6bff,#ff5cc8,#35d0ff);filter:blur(11px);opacity:.6;will-change:transform,opacity}
+  .vera-aura b{position:absolute;inset:-4px;border-radius:50%;display:block;box-shadow:0 0 26px 7px rgba(123,107,255,.5);opacity:.5;will-change:opacity,transform}
   .vera-panel{position:fixed;bottom:96px;right:22px;width:370px;max-width:calc(100vw - 32px);height:560px;max-height:calc(100vh - 130px);
     background:#0c0c12;border:1px solid rgba(255,255,255,.14);border-radius:20px;overflow:hidden;display:none;flex-direction:column;
     box-shadow:0 30px 80px -20px rgba(0,0,0,.7);z-index:2147483000;font-family:Manrope,-apple-system,Segoe UI,Arial,sans-serif}
@@ -40,6 +44,29 @@
   document.head.appendChild(css);
 
   // ---- DOM ----
+  var aura = el("div", "vera-aura");
+  aura.appendChild(document.createElement("i"));
+  aura.appendChild(document.createElement("b"));
+  document.body.appendChild(aura);
+  // aura animata via JS (gira anche con "riduci movimento" attivo)
+  (function () {
+    var ring = aura.firstChild, glow = aura.lastChild, last = null, a = 0;
+    function step(ts) {
+      if (last !== null) {
+        var dt = (ts - last) / 1000;
+        a += dt;
+        ring.style.transform = "rotate(" + ((a * 55) % 360).toFixed(1) + "deg)";
+        var breath = 0.5 + 0.35 * Math.sin(a * 2.2);
+        ring.style.opacity = (0.35 + breath * 0.4).toFixed(2);
+        glow.style.opacity = (0.25 + breath * 0.45).toFixed(2);
+        glow.style.transform = "scale(" + (0.95 + breath * 0.12).toFixed(3) + ")";
+      }
+      last = ts;
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+
   var btn = el("button", "vera-btn", "V");
   var panel = el("div", "vera-panel");
   panel.innerHTML = `
