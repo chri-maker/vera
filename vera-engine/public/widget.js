@@ -51,9 +51,11 @@
   var body = panel.querySelector(".vera-body");
   var input = panel.querySelector("input");
 
+  var greeted = false;
   btn.onclick = function () {
     panel.classList.toggle("open");
-    if (panel.classList.contains("open") && !history.length) {
+    if (panel.classList.contains("open") && !greeted) {
+      greeted = true;
       add("in", "Buongiorno 👋 Sono Vera, l'assistente dello studio. Mi scriva pure cosa le serve — un appuntamento, un'informazione — ci penso io.");
     }
     input.focus();
