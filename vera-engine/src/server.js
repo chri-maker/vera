@@ -22,13 +22,18 @@ function loadStudio(id) {
   return existsSync(f) ? JSON.parse(readFileSync(f)) : null;
 }
 
-// ---- agenda finta per la demo ----
+// ---- agenda finta per la demo: orari "puliti" in ora italiana, mai di domenica ----
 const fakeCalendar = {
   async getFreeSlots() {
-    const base = Date.now();
-    const mk = (h) => new Date(base + h * 3600e3);
-    const fmt = (d) => d.toLocaleString("it-IT", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
-    return [24, 26, 48].map((h) => { const d = mk(h); return { startISO: d.toISOString(), label: fmt(d) }; });
+    const fmt = (d) => d.toLocaleString("it-IT", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" });
+    const at = (days, h, m) => {
+      const d = new Date();
+      d.setUTCDate(d.getUTCDate() + days);
+      d.setUTCHours(h, m, 0, 0); // 8:00 UTC ≈ 10:00 in Italia (estate)
+      if (d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1); // mai di domenica
+      return d;
+    };
+    return [at(1, 8, 0), at(1, 9, 30), at(2, 14, 0)].map((d) => ({ startISO: d.toISOString(), label: fmt(d) }));
   },
   async createEvent(_s, b) { return { id: "evt_demo_" + Date.now(), ...b }; },
 };

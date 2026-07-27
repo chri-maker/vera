@@ -6,8 +6,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 const client = new Anthropic(); // usa la variabile d'ambiente ANTHROPIC_API_KEY
-// Aggiorna con l'ID modello attuale da https://docs.claude.com/en/docs/about-claude/models
-const MODEL = process.env.VERA_MODEL || "claude-sonnet-4-5";
+// ID modello attuale (luglio 2026). Se un giorno cambia, imposta VERA_MODEL su Render
+// con l'ID nuovo da https://platform.claude.com/docs/en/about-claude/models/overview
+const MODEL = process.env.VERA_MODEL || "claude-sonnet-5";
 
 function systemPrompt(studio, availability) {
   const servizi = studio.services.map((s) => `${s.name} (${s.duration} min)`).join(", ");
@@ -39,10 +40,22 @@ Rispondi SEMPRE e SOLO con un JSON valido, senza testo attorno:
  * @returns {Promise<{reply:string, action:string, booking:object|null}>}
  */
 export async function decide({ studio, history, message, availability }) {
-  const messages = [
-    ...(history || []).map((h) => ({ role: h.role, content: h.content })),
-    { role: "user", content: message },
-  ];
+  // Pulizia storico: il widget include già il messaggio corrente nella history,
+  // quindi evitiamo doppioni; uniamo turni consecutivi dello stesso ruolo e
+  // garantiamo che la conversazione inizi con l'utente (requisiti dell'API).
+  const messages = [];
+  for (const h of history || []) {
+    if (!h || !h.content) continue;
+    const role = h.role === "assistant" ? "assistant" : "user";
+    if (messages.length && messages[messages.length - 1].role === role)
+      messages[messages.length - 1].content += "\n" + h.content;
+    else messages.push({ role, content: h.content });
+  }
+  while (messages.length && messages[0].role === "assistant") messages.shift();
+  const last = messages[messages.length - 1];
+  if (!last || last.role !== "user") messages.push({ role: "user", content: message });
+  else if (!last.content.endsWith(message)) last.content += "\n" + message;
+
   const res = await client.messages.create({
     model: MODEL,
     max_tokens: 600,
