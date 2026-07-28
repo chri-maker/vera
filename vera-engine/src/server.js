@@ -22,6 +22,32 @@ function loadStudio(id) {
   return existsSync(f) ? JSON.parse(readFileSync(f)) : null;
 }
 
+// ---- notifica al titolare quando Vera fissa un appuntamento ----
+// Manda i dati a n8n, che spedisce l'email e tiene il registro.
+// Non blocca mai la risposta al paziente: se fallisce, pazienza.
+const NOTIFY_WEBHOOK = process.env.VERA_NOTIFY_WEBHOOK || "https://christianvitale.app.n8n.cloud/webhook/vera-booking";
+function notifyBooking(studio, booking) {
+  try {
+    const quando = booking.startISO
+      ? new Date(booking.startISO).toLocaleString("it-IT", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: (studio && studio.timezone) || "Europe/Rome" })
+      : "";
+    fetch(NOTIFY_WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        studioId: studio.id || "",
+        studioName: studio.name || "",
+        notifyEmail: studio.notifyEmail || process.env.VERA_NOTIFY_EMAIL || "",
+        nome: booking.patientName || "Paziente",
+        telefono: booking.patientContact || "",
+        servizio: booking.service || "",
+        quando,
+        quandoISO: booking.startISO || "",
+      }),
+    }).catch(() => {});
+  } catch {}
+}
+
 // ---- agenda finta per la demo: orari "puliti" in ora italiana, mai di domenica ----
 const fakeCalendar = {
   async getFreeSlots() {
@@ -79,6 +105,7 @@ const server = http.createServer(async (req, res) => {
         if (!studio) return send(res, 404, { error: "studio non trovato" });
         const deps = await getDeps();
         const out = await handleMessage({ studio, from, text: message, history }, deps);
+        if (out && out.action === "book" && out.booking) notifyBooking(studio, out.booking);
         send(res, 200, out);
       } catch (e) {
         send(res, 500, { error: e.message });
