@@ -43,6 +43,7 @@ function notifyBooking(studio, booking) {
         servizio: booking.service || "",
         quando,
         quandoISO: booking.startISO || "",
+        linkCalendario: booking.htmlLink || "",
       }),
     }).catch(() => {});
   } catch {}
@@ -67,7 +68,8 @@ const fakeCalendar = {
 // ---- scegli cervello e agenda in base alle chiavi disponibili ----
 async function getDeps() {
   const brain = DEMO ? await import("./brain-stub.js") : await import("./brain.js");
-  const calendar = DEMO || !process.env.GCAL_REFRESH_TOKEN ? fakeCalendar : await import("./calendar.js");
+  // agenda vera (Google Calendar via n8n) solo se il webhook è configurato
+  const calendar = DEMO || !process.env.VERA_GCAL_WEBHOOK ? fakeCalendar : await import("./calendar.js");
   return { brain, calendar };
 }
 
